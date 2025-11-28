@@ -4,18 +4,26 @@ import { prisma } from "./config/prisma";
 
 const PORT = Number(process.env.PORT || 5001);
 
-const server = app.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
+async function start() {
+  try {
+    await prisma.$connect();
+    console.log("Connected to Postgres");
 
-  prisma.$connect()
-    .then(() => console.log("Connected to Postgres"))
-    .catch((err) => {
-      console.error("Prisma connect error:", err);
-      process.exit(1);
+    const server = app.listen(PORT, () => {
+      console.log(`Server started on http://localhost:${PORT}`);
     });
-});
 
-process.on("SIGINT", async () => {
-  await prisma.$disconnect();
-  server.close(() => process.exit(0));
-});
+    // graceful shutdown
+    process.on("SIGINT", async () => {
+      console.log("\nShutting down...");
+      await prisma.$disconnect();
+      server.close(() => process.exit(0));
+    });
+
+  } catch (err: unknown) {
+    console.error("Failed to start:", err);
+    process.exit(1);
+  }
+}
+
+start();
