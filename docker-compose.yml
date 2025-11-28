@@ -1,6 +1,22 @@
 version: "3.8"
 
 services:
+  api:
+    build: .
+    container_name: auth_api
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://user:password@postgres:5432/authdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PORT: 5001
+    ports:
+      - "5001:5001"
+    command: ["npm", "run", "start:prod"]
+
   postgres:
     image: postgres:16
     container_name: auth_postgres
