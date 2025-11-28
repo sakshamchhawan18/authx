@@ -1,10 +1,13 @@
 import { api } from "../setupTest";
 import { signAccessToken } from "../../src/utils/jwt";
 
-
 describe("Protected route", () => {
   it("should work with valid token", async () => {
-    const token = signAccessToken({ sub: "123", email: "test@example.com" });
+    const token = signAccessToken({
+      id: "123",
+      email: "test@example.com",
+      role: "USER"        // required
+    });
 
     const res = await api
       .get("/api/protected")
