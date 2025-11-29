@@ -8,13 +8,16 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           String    @id @default(uuid())
+  email        String    @unique
   passwordHash String
-  role         Role     @default(USER)
-  isVerified   Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  role         Role      @default(USER)
+  isVerified   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
   deletedAt    DateTime?
+
+  // REQUIRED: back relation for AuditLog
+  auditLogs AuditLog[]
 }
 
 enum Role {
@@ -26,10 +29,11 @@ model AuditLog {
   id        String   @id @default(uuid())
   adminId   String
   userId    String
-  action    String   // e.g. "ROLE_CHANGED"
+  action    String
   oldValue  String?
   newValue  String?
   createdAt DateTime @default(now())
-   user      User     @relation(fields: [userId], references: [id])
-}
 
+  // Relation to User
+  user User @relation(fields: [userId], references: [id])
+}
