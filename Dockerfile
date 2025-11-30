@@ -19,8 +19,8 @@ RUN npm install --omit=dev
 COPY prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
-# Generate prisma client (uses DATABASE_URL)
+# Generate Prisma client
 RUN npx prisma generate
 
-# Railway will inject PORT. We listen on 0.0.0.0.
-CMD ["node", "dist/server.js"]
+# Start app + run migrations at runtime
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
