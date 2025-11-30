@@ -27,7 +27,17 @@ COPY prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
 # Generate Prisma client at runtime (env vars available here)
-# DATABASE_URL now exists because docker-compose injects it
 RUN npx prisma generate
 
+# ---------------------------------------------------
+# 🔥 Add wait-for-postgres script here
+# ---------------------------------------------------
+COPY wait-for-postgres.sh /app/wait-for-postgres.sh
+RUN chmod +x /app/wait-for-postgres.sh
+
+# ---------------------------------------------------
+# ENTRYPOINT waits for Postgres
+# CMD starts your app
+# ---------------------------------------------------
+ENTRYPOINT ["/app/wait-for-postgres.sh"]
 CMD ["node", "dist/server.js"]

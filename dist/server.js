@@ -7,7 +7,6 @@ if (process.env.NODE_ENV !== "production") {
     console.log("Loading .env (development mode)");
     require("dotenv").config();
 }
-//import "dotenv/config";
 const app_1 = __importDefault(require("./app"));
 const prisma_1 = require("./config/prisma");
 const PORT = Number(process.env.PORT) || 5001;
