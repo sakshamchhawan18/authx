@@ -1,8 +1,12 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 import "dotenv/config";
 import app from "./app";
 import { prisma } from "./config/prisma";
 
-const PORT = Number(process.env.PORT) || 8080;
+const PORT = Number(process.env.PORT) || 5001;
 
 async function start() {
   try {
