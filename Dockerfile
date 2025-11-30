@@ -3,17 +3,12 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build TypeScript
+# Build TypeScript only (NO prisma generate here)
 RUN npm run build
 
 
@@ -25,13 +20,14 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
 
-# Copy Prisma folder (needed for runtime)
+# Copy Prisma schema for runtime `prisma generate`
 COPY prisma ./prisma
 
-# Copy compiled JavaScript + Prisma Client
+# Copy compiled JavaScript
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Start API
+# Generate Prisma client at runtime (env vars available here)
+# DATABASE_URL now exists because docker-compose injects it
+RUN npx prisma generate
+
 CMD ["node", "dist/server.js"]

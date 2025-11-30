@@ -7,7 +7,7 @@ services:
       - postgres
       - redis
     environment:
-      DATABASE_URL: postgres://user:password@postgres:5432/authdb
+      DATABASE_URL: postgres://user:password@postgres:5432/authdb?schema=public
       REDIS_HOST: redis
       REDIS_PORT: 6379
       PORT: 5001
