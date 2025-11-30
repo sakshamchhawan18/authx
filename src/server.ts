@@ -19,9 +19,12 @@ async function start() {
     await prisma.$connect();
     console.log("Connected to Postgres");
 
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT,"0.0.0.0", () => {
       console.log(`Server started on http://localhost:${PORT}`);
     });
+
+  
+
 
     // graceful shutdown
     process.on("SIGINT", async () => {
