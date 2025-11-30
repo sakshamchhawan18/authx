@@ -7,15 +7,13 @@
     "strict": true,
     "skipLibCheck": true,
 
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "dist",
 
     "types": ["node", "jest"],
-
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true
   },
-
-  "include": ["src", "tests"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "tests"]
 }

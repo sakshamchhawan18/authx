@@ -3,10 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
+}
+//import "dotenv/config";
 const app_1 = __importDefault(require("./app"));
 const prisma_1 = require("./config/prisma");
-const PORT = Number(process.env.PORT || 5001);
+const PORT = Number(process.env.PORT) || 5001;
 async function start() {
     try {
         await prisma_1.prisma.$connect();

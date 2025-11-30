@@ -42,10 +42,11 @@ exports.login = login;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_1 = require("../config/prisma");
 const jwt_1 = require("../utils/jwt");
-const uuid_1 = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const SessionService = __importStar(require("./session.service"));
 const SALT_ROUNDS = 10;
-const REFRESH_TTL = Number(process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 30); // 30 days
+const REFRESH_TTL = Number(process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 30 // 30 days
+);
 async function register(payload) {
     const { email, password } = payload;
     const existing = await prisma_1.prisma.user.findUnique({ where: { email } });
@@ -55,9 +56,14 @@ async function register(payload) {
         throw err;
     }
     const passwordHash = await bcrypt_1.default.hash(password, SALT_ROUNDS);
+    // role defaults to USER
     const user = await prisma_1.prisma.user.create({
-        data: { email, passwordHash },
-        select: { id: true, email: true, createdAt: true },
+        data: {
+            email,
+            passwordHash,
+            role: payload.role || "USER"
+        },
+        select: { id: true, email: true, role: true, createdAt: true }
     });
     return { user };
 }
@@ -75,15 +81,27 @@ async function login(payload) {
         err.status = 401;
         throw err;
     }
-    // Generate access + refresh
-    const accessToken = (0, jwt_1.signAccessToken)({ sub: user.id, email: user.email });
-    const jti = (0, uuid_1.v4)();
-    const refreshToken = (0, jwt_1.signRefreshToken)({ sub: user.id, email: user.email }, jti);
+    // 👇 Include RBAC role in JWT payload
+    const accessToken = (0, jwt_1.signAccessToken)({
+        id: user.id,
+        email: user.email,
+        role: user.role
+    });
+    const jti = uuidv4();
+    const refreshToken = (0, jwt_1.signRefreshToken)({
+        id: user.id,
+        email: user.email,
+        role: user.role
+    }, jti);
     // Store refresh token in Redis
     await SessionService.storeRefreshToken(jti, user.id, REFRESH_TTL);
     return {
         accessToken,
         refreshToken,
-        user: { id: user.id, email: user.email }
+        user: {
+            id: user.id,
+            email: user.email,
+            role: user.role
+        }
     };
 }

@@ -1,8 +1,10 @@
 if (process.env.NODE_ENV !== "production") {
+  console.log("Loading .env (development mode)");
   require("dotenv").config();
 }
 
-import "dotenv/config";
+
+//import "dotenv/config";
 import app from "./app";
 import { prisma } from "./config/prisma";
 
